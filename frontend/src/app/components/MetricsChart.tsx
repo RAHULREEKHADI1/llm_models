@@ -27,7 +27,7 @@ const MetricsChart: React.FC<Props> = ({ metrics }) => {
         backgroundColor: "rgba(99, 102, 241, 0.8)",
         borderRadius: 8,
         hoverBackgroundColor: "rgba(129, 140, 248, 1)",
-        barThickness: 40 as const, // Fixed type for bar thickness
+        barThickness: 40 as const,
       },
     ],
   };

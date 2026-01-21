@@ -5,7 +5,6 @@ from rouge_score import rouge_scorer
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Load once
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def compute_bleu(reference: str, generated: str) -> float:
