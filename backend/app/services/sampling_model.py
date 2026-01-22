@@ -1,13 +1,15 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from app.services.model_container import ModelContainer
 import torch
 
-MODEL_NAME = "distilgpt2"
-
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
 
 
 def generate_samples(prompt, temperature, top_k, top_p, num_outputs,max_new_token=120):
+    tokenizer = ModelContainer.decoder_tokenizer
+    model = ModelContainer.decoder_model
+
+    if tokenizer is None or model is None:
+        raise RuntimeError("Decoder model not loaded")
+
     inputs = tokenizer(prompt, return_tensors="pt")
 
     outputs = model.generate(

@@ -1,0 +1,12 @@
+nohup: ignoring input
+INFO:     Started server process [1377877]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5050 (Press CTRL+C to quit)
+ Loading models...
+Models loaded
+INFO:     49.36.186.32:62057 - "OPTIONS /generate/decoder HTTP/1.1" 200 OK
+INFO:     49.36.186.32:62058 - "OPTIONS /generate/encoder_decoder HTTP/1.1" 200 OK
+Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
+INFO:     49.36.186.32:62058 - "POST /generate/encoder_decoder HTTP/1.1" 200 OK
+INFO:     49.36.186.32:62057 - "POST /generate/decoder HTTP/1.1" 200 OK

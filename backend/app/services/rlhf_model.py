@@ -1,13 +1,14 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from sqlalchemy.orm import Session
 from app.database.models_rlhf import PreferenceLog
+from app.services.model_container import ModelContainer
 
-MODEL_NAME = "distilgpt2"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
 
 def generate_candidates(prompt: str, n: int = 3):
+    tokenizer = ModelContainer.decoder_tokenizer
+    model = ModelContainer.decoder_model
+
+
     inputs = tokenizer(prompt, return_tensors="pt")
     input_len = inputs["input_ids"].shape[1]
 

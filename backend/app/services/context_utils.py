@@ -1,12 +1,5 @@
-from transformers import AutoTokenizer
+from app.services.model_container import ModelContainer
 
-SHORT_MODEL = "distilgpt2"
-LONG_MODEL = "google/long-t5-tglobal-base"
-
-tokenizers = {
-    "short": AutoTokenizer.from_pretrained(SHORT_MODEL),
-    "long": AutoTokenizer.from_pretrained(LONG_MODEL),
-}
 
 CONTEXT_LIMITS = {
     "short": 1024,
@@ -14,10 +7,18 @@ CONTEXT_LIMITS = {
 }
 
 def process_context(text: str, model_type: str):
-    if model_type not in tokenizers:
+    if model_type not in ("short", "long"):
         raise ValueError("Invalid model_type")
 
-    tokenizer = tokenizers[model_type]
+    if model_type == "short":
+        tokenizer = ModelContainer.decoder_tokenizer
+    else:
+        tokenizer = ModelContainer.enc_dec_tokenizer
+
+    if tokenizer is None:
+        raise RuntimeError("Tokenizer not loaded yet")
+
+
     max_tokens = CONTEXT_LIMITS[model_type]
 
     tokens = tokenizer.encode(text)
