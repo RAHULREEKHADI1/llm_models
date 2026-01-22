@@ -8,11 +8,13 @@ const Module5 = () => {
   const [ranking, setRanking] = useState<number[]>([]);
   const [biasedResponse, setBiasedResponse] = useState<string>("");
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const handleGenerate = async () => {
-    if (!prompt) return;
+    if (!prompt || loading) return;
+    setLoading(true);
     setStatus("Synthesizing candidates...");
     try {
       const res = await fetch(`${API_BASE}/rlhf/generate`, {
@@ -28,6 +30,7 @@ const Module5 = () => {
       console.error(err);
     } finally {
       setStatus("");
+      setLoading(false);
     }
   };
 
@@ -38,6 +41,8 @@ const Module5 = () => {
   };
 
   const handleSubmitRanking = async () => {
+    if (loading) return;
+    setLoading(true);
     setStatus("Updating reward model...");
     try {
       await fetch(`${API_BASE}/rlhf/rank`, {
@@ -50,10 +55,14 @@ const Module5 = () => {
     } catch (err) {
       console.error(err);
       setStatus("Submission failed.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleGenerateBiased = async () => {
+    if (loading) return;
+    setLoading(true);
     setStatus("Applying alignment policy...");
     try {
       const res = await fetch(`${API_BASE}/rlhf/generate_biased`, {
@@ -67,6 +76,7 @@ const Module5 = () => {
       console.error(err);
     } finally {
       setStatus("");
+      setLoading(false);
     }
   };
 
@@ -88,14 +98,16 @@ const Module5 = () => {
             type="text"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
+            disabled={loading}
             placeholder="Type a sensitive or complex prompt to test alignment..."
-            className="flex-1 px-6 py-4 bg-transparent outline-none text-slate-200 placeholder:text-slate-600"
+            className="flex-1 px-6 py-4 bg-transparent outline-none text-slate-200 placeholder:text-slate-600 disabled:opacity-50"
           />
           <button
             onClick={handleGenerate}
-            className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20"
+            disabled={loading || !prompt}
+            className="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Generate
+            {loading ? "Processing..." : "Generate"}
           </button>
         </div>
 
@@ -111,16 +123,18 @@ const Module5 = () => {
             <div className="flex flex-wrap gap-4 items-center justify-between border-t border-slate-800 pt-8">
               <button
                 onClick={handleSubmitRanking}
-                className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/10"
+                disabled={loading}
+                className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Submit Preference Ranking
               </button>
               
               <button
                 onClick={handleGenerateBiased}
-                className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/10"
+                disabled={loading}
+                className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Inference Aligned Model
+                Biased Response
               </button>
             </div>
 
