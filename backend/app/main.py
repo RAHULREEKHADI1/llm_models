@@ -17,6 +17,7 @@ from app.routes.comparison import router as comparison_router
 from app.routes import tuning
 from app.routes.tuning import router as tuning_router
 from app.core.config import get_settings
+from peft import LoraConfig, get_peft_model
 
 settings = get_settings()
 app = FastAPI(title="LLM Architecture Lab")
@@ -36,7 +37,22 @@ def load_models():
     print(" Loading models...")
 
     ModelContainer.decoder_tokenizer = AutoTokenizer.from_pretrained(settings.DECODER_MODEL_NAME)
-    ModelContainer.decoder_model = AutoModelForCausalLM.from_pretrained(settings.DECODER_MODEL_NAME)
+    base_model = AutoModelForCausalLM.from_pretrained(settings.DECODER_MODEL_NAME)
+
+    lora_config = LoraConfig(
+        r=8,
+        lora_alpha=16,
+        target_modules=["c_attn"],  
+        lora_dropout=0.05,
+        bias="none",
+        task_type="CAUSAL_LM"
+    )
+
+    lora_model = get_peft_model(base_model, lora_config)
+    lora_model.print_trainable_parameters()
+
+    ModelContainer.decoder_model = base_model
+    ModelContainer.decoder_lora_model = lora_model
 
     ModelContainer.enc_dec_tokenizer = AutoTokenizer.from_pretrained(settings.ENC_DEC_MODEL_NAME)
     ModelContainer.enc_dec_model = AutoModelForSeq2SeqLM.from_pretrained(settings.ENC_DEC_MODEL_NAME)
