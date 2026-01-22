@@ -1,12 +1,12 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from app.services.model_container import ModelContainer
 
-MODEL_NAME = "distilgpt2"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
 
 
 def generate_text(prompt: str, temperature=0.7):
+    tokenizer = ModelContainer.decoder_tokenizer
+    model = ModelContainer.decoder_model
+    
     inputs = tokenizer(prompt, return_tensors="pt")
     outputs = model.generate(
         **inputs,

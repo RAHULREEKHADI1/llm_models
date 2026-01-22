@@ -1,12 +1,9 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import LoraConfig, get_peft_model
+from app.services.model_container import ModelContainer
 
-MODEL_NAME = "distilgpt2"
+tokenizer = ModelContainer.decoder_tokenizer
+model = ModelContainer.decoder_model
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
-
-# LoRA configuration (tiny, CPU-safe)
 lora_config = LoraConfig(
     r=8,
     lora_alpha=16,
